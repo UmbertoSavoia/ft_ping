@@ -1,5 +1,6 @@
 .idea
 ft_ping
+.gdb_history
 
 # Prerequisites
 *.d

@@ -7,7 +7,7 @@
  *          0: false
  *          1: true
  */
-int     is_opt(char *av, char *type)
+int     is_opt(const char *av, char *type)
 {
     t_check_opt check_opt[] = {
             { "-v", OPT_BOOL },

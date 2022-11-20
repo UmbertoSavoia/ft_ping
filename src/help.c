@@ -1,5 +1,10 @@
 #include "ft_ping.h"
 
+int     error(void)
+{
+    return printf("ft_ping: usage error: Destination address required\n");
+}
+
 int help(void)
 {
     printf("\
