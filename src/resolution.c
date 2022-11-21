@@ -30,5 +30,7 @@ int     resolve_hostname(const char *av, const int *opts, char *ip, struct socka
 
     printf("PING %s (%s) %d bytes of data.\n",
            tmp->ai_canonname, ip, opts['s'] ? opts['s'] : DEFAULT_SIZE_DATA);
+    memcpy(global.host, tmp->ai_canonname, strlen(tmp->ai_canonname));
+    freeaddrinfo(addrinfo_list);
     return sockfd;
 }

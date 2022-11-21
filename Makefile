@@ -9,12 +9,12 @@ SRC = $(wildcard ./src/*.c)
 OBJ = $(SRC:.c=.o)
 
 %.o: %.c
-	$(CC) $(CFLAG) -o $@ -I ./include -c $^
+	$(CC) $(CFLAG) -o $@ -lm -I ./include -c $^
 
 all: $(TARGET)
 
 $(TARGET): $(OBJ) $(INCLUDE)
-	$(CC) $(CFLAG) -o $@ $(OBJ)
+	$(CC) $(CFLAG) -o $@ $(OBJ) -lm
 
 clean:
 	$(RM) $(OBJ)
