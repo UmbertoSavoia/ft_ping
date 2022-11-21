@@ -6,8 +6,13 @@ void    handler_sig(int sig)
 {
     if (sig == SIGINT)
         global.loop = 0;
-    else if (sig == SIGALRM)
-        global.loop ^= 0b00000010;
+    else if (sig == SIGALRM) {
+        if (global.loop & 0b00000010) {
+            global.loop ^= 0b00000100;
+        } else if (!(global.loop & 0b00000100)) {
+            global.loop ^= 0b00000010;
+        }
+    }
 }
 
 int     main(int ac, char **av)

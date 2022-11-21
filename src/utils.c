@@ -1,6 +1,6 @@
 #include "ft_ping.h"
 
-double  timeval_to_ms(struct timeval *t)
+long double  timeval_to_ms(struct timeval *t)
 {
-    return t->tv_sec + t->tv_usec / 1000.0;
+    return (t->tv_sec * (uint64_t)1000) + (t->tv_usec / 1000.0);
 }

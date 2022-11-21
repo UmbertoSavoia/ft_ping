@@ -48,6 +48,6 @@ int     check_arg(int ac, char **av, int *opt);
 int     help(void);
 int     resolve_hostname(const char *av, const int *opts, char *ip, struct sockaddr_in *dst);
 void    ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in *dst);
-double  timeval_to_ms(struct timeval *t);
+long double  timeval_to_ms(struct timeval *t);
 
 #endif

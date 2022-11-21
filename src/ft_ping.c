@@ -43,14 +43,11 @@ uint16_t checksum(void *packet, uint32_t len)
 uint8_t *create_packet(uint32_t len_data)
 {
     uint8_t *packet = 0;
-    struct icmphdr *hdr_packet = 0;
     uint8_t *data_packet = 0;
 
     if (!(packet = malloc(sizeof(struct icmphdr) + len_data)))
         return 0;
-    hdr_packet = (struct icmphdr *)packet;
     data_packet = packet + sizeof(struct icmphdr);
-
     memset(data_packet, 'A', len_data);
     return packet;
 }
@@ -58,7 +55,7 @@ uint8_t *create_packet(uint32_t len_data)
 int     recv_packet(int sockfd, uint8_t *packet, uint32_t len_packet)
 {
     struct timeval s_recv = {0}, e_recv = {0};
-    int32_t bytes = 0;
+    ssize_t bytes = 0;
     char name[NI_MAXHOST] = {0};
     char ip_str[INET_ADDRSTRLEN] = {0};
     struct msghdr msg = {0};
@@ -67,7 +64,7 @@ int     recv_packet(int sockfd, uint8_t *packet, uint32_t len_packet)
     struct icmphdr *icmp = 0;
     struct iphdr *ip = 0;
     int hlen = 0;
-    double time = 0;
+    long double time = 0;
 
     memset(packet, 0, len_packet);
     iov.iov_base = packet;
@@ -90,7 +87,7 @@ int     recv_packet(int sockfd, uint8_t *packet, uint32_t len_packet)
             name, sizeof(name), 0, 0, NI_IDN);
     timersub(&e_recv, &s_recv, &s_recv);
     time = timeval_to_ms(&s_recv);
-    printf("%d bytes from %s (%s): icmp_seq=%d ttl=%d time=%.2f ms\n",
+    printf("%ld bytes from %s (%s): icmp_seq=%d ttl=%d time=%.2Lf ms\n",
            bytes, name, ip_str, ntohs(icmp->un.echo.sequence), ip->ttl, time);
     global.avg += time;
     if (time < global.min_time || !global.min_time)
@@ -127,16 +124,20 @@ void    ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in 
             } else {
                 global.packet_sended++;
             }
+            global.loop ^= 0b00000100;
+            alarm(1);
+            while (global.loop & 0b00000100);
             if (recv_packet(sockfd, packet, len_packet) < 0) {
-                printf("From %s icmp_seq=%d Destination Net Unreachable\n", global.host, seq);
+                //printf("From %s icmp_seq=%d Destination Net Unreachable\n", global.host, seq);
+                printf("From %s: type=%d code=%d\n", global.host, hdr_packet->type, hdr_packet->code);
             } else {
                 global.packet_reiceved++;
             }
             if (opts['c'] && opts['c'] == seq)
                 break;
             ++seq;
-            global.loop ^= 0b00000010;
-            alarm(1);
+            //global.loop ^= 0b00000010;
+            //alarm(1);
         }
     }
     free(packet);
