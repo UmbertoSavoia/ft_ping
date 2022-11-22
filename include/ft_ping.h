@@ -14,8 +14,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <linux/icmp.h>
 #include <netinet/ip.h>
+#include <linux/icmp.h>
+#include <linux/errqueue.h>
 
 #define OPT_ARG     1
 #define OPT_BOOL    2
@@ -43,11 +44,11 @@ typedef struct  s_stat
 
 extern t_stat global;
 
-int     error(void);
-int     check_arg(int ac, char **av, int *opt);
-int     help(void);
-int     resolve_hostname(const char *av, const int *opts, char *ip, struct sockaddr_in *dst);
-void    ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in *dst);
-long double  timeval_to_ms(struct timeval *t);
+int             error(void);
+int             check_arg(int ac, char **av, int *opt);
+int             help(void);
+int             resolve_hostname(const char *av, const int *opts, char *ip, struct sockaddr_in *dst);
+void            ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in *dst);
+long double     timeval_to_ms(struct timeval *t);
 
 #endif

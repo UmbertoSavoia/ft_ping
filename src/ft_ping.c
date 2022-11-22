@@ -12,7 +12,7 @@ void    statistics(void)
     mdev = sqrt(mdev);
 
     printf("\n--- %s ft_ping statistics ---\n", global.host);
-    printf("%d packets transmitted, %d received, %.0f%% packet loss, time %.0fms\n",
+    printf("%d packets transmitted, %d received, %.0f%% packet loss, time %.0Lfms\n",
            global.packet_sended,
            global.packet_reiceved,
            (global.packet_sended - global.packet_reiceved) / global.packet_sended * 100.0,
@@ -75,7 +75,7 @@ int     recv_packet(int sockfd, uint8_t *packet, uint32_t len_packet)
     msg.msg_iovlen = 1;
 
     gettimeofday(&s_recv, 0);
-    if ((bytes = recvmsg(sockfd, &msg, /*MSG_WAITALL*/MSG_DONTWAIT)) < 0) {
+    if ((bytes = recvmsg(sockfd, &msg, MSG_WAITALL /*MSG_DONTWAIT*/)) < 0) {
         return -1;
     }
     gettimeofday(&e_recv, 0);
@@ -96,6 +96,37 @@ int     recv_packet(int sockfd, uint8_t *packet, uint32_t len_packet)
         global.max_time = time;
     global.square += time * time;
     return 0;
+}
+
+void    recv_error(int sockfd)
+{
+    char cbuf[4096] = {0};
+    struct iovec iov = {0};
+    struct msghdr msg = {0};
+    struct icmphdr icmph = {0};
+    struct sockaddr_in target = {0};
+    struct cmsghdr *cmsgh = 0;
+    struct sock_extended_err *e = 0;
+
+    iov.iov_base = &icmph;
+    iov.iov_len = sizeof(icmph);
+    msg.msg_name = &target;
+    msg.msg_namelen = sizeof(target);
+    msg.msg_iov = &iov;
+    msg.msg_iovlen = 1;
+    msg.msg_control = cbuf;
+    msg.msg_controllen = sizeof(cbuf);
+
+    recvmsg(sockfd, &msg, MSG_ERRQUEUE /*| MSG_DONTWAIT*/);
+
+    for (cmsgh = CMSG_FIRSTHDR(&msg); cmsgh; cmsgh = CMSG_NXTHDR(&msg, cmsgh)) {
+        if (cmsgh->cmsg_level == SOL_IP) {
+            if (cmsgh->cmsg_type == IP_RECVERR)
+                e = (struct sock_extended_err *)CMSG_DATA(cmsgh);
+        }
+    }
+    if (e)
+        printf("From %s: type=%d code=%d info=%d\n", global.host, e->ee_type, e->ee_code, e->ee_info);
 }
 
 void    ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in *dst)
@@ -124,20 +155,18 @@ void    ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in 
             } else {
                 global.packet_sended++;
             }
-            global.loop ^= 0b00000100;
-            alarm(1);
-            while (global.loop & 0b00000100);
             if (recv_packet(sockfd, packet, len_packet) < 0) {
                 //printf("From %s icmp_seq=%d Destination Net Unreachable\n", global.host, seq);
-                printf("From %s: type=%d code=%d\n", global.host, hdr_packet->type, hdr_packet->code);
+                //printf("From %s: type=%d code=%d\n", global.host, hdr_packet->type, hdr_packet->code);
+                recv_error(sockfd);
             } else {
                 global.packet_reiceved++;
             }
             if (opts['c'] && opts['c'] == seq)
                 break;
             ++seq;
-            //global.loop ^= 0b00000010;
-            //alarm(1);
+            global.loop ^= 0b00000010;
+            alarm(1);
         }
     }
     free(packet);
