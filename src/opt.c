@@ -11,10 +11,12 @@ int     is_opt(const char *av, char *type)
 {
     t_check_opt check_opt[] = {
             { "-v", OPT_BOOL },
-            { "-t", OPT_ARG },
             { "-h", OPT_BOOL },
+            { "-t", OPT_ARG },
             { "-c", OPT_ARG },
-            { "-s", OPT_ARG }
+            { "-s", OPT_ARG },
+            { "-i", OPT_ARG },
+            { "-d", OPT_BOOL }
     };
     int len = sizeof(check_opt) / sizeof(check_opt[0]);
 
@@ -61,5 +63,7 @@ int     check_arg(int ac, char **av, int *opt)
                 break;
         }
     }
-    return ret;
+    if (opt['i'] <= 0)
+        opt['i'] = 1;
+    return opt['h'] ? 0 : ret;
 }

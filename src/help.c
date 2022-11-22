@@ -15,8 +15,8 @@ Options: \n\
   <destination>      dns name or ip address \n\
   -h                 print help and exit \n\
   -v                 verbose output \n\
-  -c <count>         stop after <count> replies \n\
   -d                 use SO_DEBUG socket option \n\
+  -c <count>         stop after <count> replies \n\
   -s <size>          use <size> as number of data bytes to be sent \n\
   -i <interval>      seconds between sending each packet \n\
   -t <ttl>           define time to live \n\

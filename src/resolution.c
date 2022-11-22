@@ -30,6 +30,10 @@ int     resolve_hostname(const char *av, const int *opts, char *ip, struct socka
 
     setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
     setsockopt(sockfd, SOL_IP, IP_RECVERR, &hold, sizeof(hold));
+    if (opts['d'])
+        setsockopt(sockfd, SOL_SOCKET, SO_DEBUG, &hold, sizeof(hold));
+    if (opts['t'])
+        setsockopt(sockfd, IPPROTO_IP, IP_TTL, &opts['t'], sizeof(int));
     memcpy(&addr, tmp->ai_addr, tmp->ai_addrlen);
     inet_ntop(addr.ss_family, (void *)&((struct sockaddr_in *)&addr)->sin_addr, ip, INET_ADDRSTRLEN);
     memcpy(&(dst->sin_addr), &((struct sockaddr_in *)&addr)->sin_addr, sizeof(struct in_addr));

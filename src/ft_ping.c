@@ -98,7 +98,7 @@ int     recv_packet(int sockfd, uint8_t *packet, uint32_t len_packet)
     return 0;
 }
 
-void    recv_error(int sockfd)
+void    recv_error(int sockfd, const int *opts)
 {
     char cbuf[4096] = {0};
     struct iovec iov = {0};
@@ -127,6 +127,8 @@ void    recv_error(int sockfd)
     }
     if (e)
         printf("From %s: type=%d code=%d info=%d\n", global.host, e->ee_type, e->ee_code, e->ee_info);
+    else if (opts['v'])
+        printf("From %s: type=%d code=%d\n", global.host, icmph.type, icmph.code);
 }
 
 void    ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in *dst)
@@ -156,9 +158,7 @@ void    ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in 
                 global.packet_sended++;
             }
             if (recv_packet(sockfd, packet, len_packet) < 0) {
-                //printf("From %s icmp_seq=%d Destination Net Unreachable\n", global.host, seq);
-                //printf("From %s: type=%d code=%d\n", global.host, hdr_packet->type, hdr_packet->code);
-                recv_error(sockfd);
+                recv_error(sockfd, opts);
             } else {
                 global.packet_reiceved++;
             }
@@ -166,7 +166,7 @@ void    ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in 
                 break;
             ++seq;
             global.loop ^= 0b00000010;
-            alarm(1);
+            alarm(opts['i']);
         }
     }
     free(packet);
