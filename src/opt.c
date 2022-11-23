@@ -12,11 +12,11 @@ int     is_opt(const char *av, char *type)
     t_check_opt check_opt[] = {
             { "-v", OPT_BOOL },
             { "-h", OPT_BOOL },
-            { "-t", OPT_ARG },
+            { "-d", OPT_BOOL },
             { "-c", OPT_ARG },
             { "-s", OPT_ARG },
             { "-i", OPT_ARG },
-            { "-d", OPT_BOOL }
+            { "-t", OPT_ARG }
     };
     int len = sizeof(check_opt) / sizeof(check_opt[0]);
 
@@ -52,13 +52,13 @@ int     check_arg(int ac, char **av, int *opt)
             case 1:
                 if (type == OPT_ARG) {
                     if (av[i][2] == 0) {
-                        opt[av[i][1]] = atoi(av[i+1]);
+                        opt[(uint8_t)av[i][1]] = atoi(av[i+1]);
                         ++i;
                     } else {
-                        opt[av[i][1]] = atoi(&av[i][2]);
+                        opt[(uint8_t)av[i][1]] = atoi(&av[i][2]);
                     }
                 } else {
-                    opt[av[i][1]] = 1;
+                    opt[(uint8_t)av[i][1]] = 1;
                 }
                 break;
         }

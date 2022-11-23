@@ -33,6 +33,6 @@ int     main(int ac, char **av)
             return opts['h'] ? help() : error();
     }
     if ((sockfd = resolve_hostname(av[arg], opts, ip, &dst)) < 0)
-        return printf("ft_ping: %s: Temporary failure in name resolution\n", av[arg]);
-    ft_ping(sockfd, ip, opts, &dst);
+        return (sockfd == -2) ? 1 : printf("ft_ping: %s: Temporary failure in name resolution\n", av[arg]);
+    ft_ping(sockfd, opts, &dst);
 }

@@ -19,7 +19,6 @@ Options: \n\
   -c <count>         stop after <count> replies \n\
   -s <size>          use <size> as number of data bytes to be sent \n\
   -i <interval>      seconds between sending each packet \n\
-  -t <ttl>           define time to live \n\
-  -W <timeout>       time to wait for response \n");
+  -t <ttl>           define time to live \n");
     return 0;
 }

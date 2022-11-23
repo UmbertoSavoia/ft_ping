@@ -1,7 +1,7 @@
 TARGET = ft_ping
 
 CC = gcc
-CFLAG = -g #-Wall -Wextra -Werror
+CFLAG = -g -Wall -Wextra -Werror
 RM = rm -rf
 
 INCLUDE = $(wildcard ./include/*.h)

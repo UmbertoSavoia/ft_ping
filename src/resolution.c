@@ -29,8 +29,8 @@ int     resolve_hostname(const char *av, const int *opts, char *ip, struct socka
     hints.ai_flags = AI_CANONNAME;
 
     if ((error = getaddrinfo(av, 0, &hints, &addrinfo_list))) {
-        printf("error: %s\n", gai_strerror(error));
-        return -1;
+        printf("ft_ping: %s: %s\n", av, gai_strerror(error));
+        return -2;
     }
     for (tmp = addrinfo_list; tmp; tmp = tmp->ai_next) {
         if ((sockfd = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol)) >= 0)

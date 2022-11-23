@@ -103,13 +103,16 @@ void    recv_error(int sockfd, const int *opts)
     char cbuf[4096] = {0};
     struct iovec iov = {0};
     struct msghdr msg = {0};
-    struct icmphdr icmph = {0};
     struct sockaddr_in target = {0};
     struct cmsghdr *cmsgh = 0;
     struct sock_extended_err *e = 0;
+    struct icmphdr icmph = {0};
+    char ip_str[INET_ADDRSTRLEN] = {0};
+    char name[NI_MAXHOST] = {0};
 
     iov.iov_base = &icmph;
     iov.iov_len = sizeof(icmph);
+
     msg.msg_name = &target;
     msg.msg_namelen = sizeof(target);
     msg.msg_iov = &iov;
@@ -125,13 +128,22 @@ void    recv_error(int sockfd, const int *opts)
                 e = (struct sock_extended_err *)CMSG_DATA(cmsgh);
         }
     }
-    if (e)
-        printf("From %s: type=%d code=%d info=%d\n", global.host, e->ee_type, e->ee_code, e->ee_info);
-    else if (opts['v'])
+    if (e && opts['v']) {
+        struct sockaddr_in *sin = (struct sockaddr_in *)(e + 1);
+        inet_ntop(AF_INET, &sin->sin_addr, ip_str, INET_ADDRSTRLEN);
+        getnameinfo((struct sockaddr *)sin, sizeof(struct sockaddr),
+                    name, sizeof(name), 0, 0, NI_IDN);
+        if (e->ee_type == ICMP_TIME_EXCEEDED) {
+            printf("From %s (%s) Time to live exceeded\n", name, ip_str);
+        } else {
+            printf("From %s: type=%d code=%d info=%d\n", global.host, e->ee_type, e->ee_code, e->ee_info);
+        }
+    } else if (opts['v']) {
         printf("From %s: type=%d code=%d\n", global.host, icmph.type, icmph.code);
+    }
 }
 
-void    ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in *dst)
+void    ft_ping(int sockfd, const int *opts, struct sockaddr_in *dst)
 {
     uint8_t *packet = 0;
     struct icmphdr *hdr_packet = 0;
@@ -142,7 +154,7 @@ void    ft_ping(int sockfd, const char *ip, const int *opts, struct sockaddr_in 
         return;
     hdr_packet = (struct icmphdr *)packet;
     gettimeofday(&global.start, 0);
-    for (uint32_t seq = 1; global.loop & 0b00000001;) {
+    for (int seq = 1; global.loop & 0b00000001;) {
         if (global.loop & 0b00000010) {
             hdr_packet->type = ICMP_ECHO;
             hdr_packet->code = 0;
