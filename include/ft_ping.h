@@ -36,10 +36,10 @@ typedef struct  s_stat
     struct timeval start;
     uint32_t packet_sended;
     uint32_t packet_reiceved;
-    double max_time;
-    double min_time;
-    double avg;
-    double square;
+    long double max_time;
+    long double min_time;
+    long double avg;
+    long double square;
 }               t_stat;
 
 extern t_stat global;
