@@ -82,6 +82,8 @@ int     recv_packet(int sockfd, uint8_t *packet, uint32_t len_packet)
     ip = (struct iphdr *)msg.msg_iov->iov_base;
     hlen = ip->ihl * 4;
     icmp = (struct icmphdr *)(msg.msg_iov->iov_base + hlen);
+    if (ntohs(icmp->un.echo.id) != getpid())
+        return -1;
     inet_ntop(buf_in.sin_family, &buf_in.sin_addr, ip_str, INET_ADDRSTRLEN);
     getnameinfo((struct sockaddr *)&buf_in, sizeof(struct sockaddr),
             name, sizeof(name), 0, 0, NI_IDN);
