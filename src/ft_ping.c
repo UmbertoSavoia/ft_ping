@@ -3,7 +3,7 @@
 void    statistics(void)
 {
     struct timeval end;
-    double mdev = 0;
+    long double mdev = 0;
 
     gettimeofday(&end, 0);
     timersub(&end, &global.start, &end);
@@ -18,7 +18,7 @@ void    statistics(void)
            (global.packet_sended - global.packet_reiceved) / global.packet_sended * 100.0,
            timeval_to_ms(&end));
     if (global.packet_reiceved) {
-        printf("rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3f ms\n",
+        printf("rtt min/avg/max/mdev = %.3Lf/%.3Lf/%.3Lf/%.3Lf ms\n",
                global.min_time,
                global.avg,
                global.max_time,
