@@ -82,7 +82,7 @@ int     recv_packet(int sockfd, uint8_t *packet, uint32_t len_packet)
     ip = (struct iphdr *)msg.msg_iov->iov_base;
     hlen = ip->ihl * 4;
     icmp = (struct icmphdr *)(msg.msg_iov->iov_base + hlen);
-    if (ntohs(icmp->un.echo.id) != getpid())
+    if (icmp->un.echo.id != getpid())
         return -1;
     inet_ntop(buf_in.sin_family, &buf_in.sin_addr, ip_str, INET_ADDRSTRLEN);
     getnameinfo((struct sockaddr *)&buf_in, sizeof(struct sockaddr),
@@ -119,6 +119,7 @@ void    recv_error(int sockfd, const int *opts)
     msg.msg_namelen = sizeof(target);
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
+    msg.msg_flags = 0;
     msg.msg_control = cbuf;
     msg.msg_controllen = sizeof(cbuf);
 
