@@ -83,7 +83,7 @@ int     recv_packet(int sockfd, uint8_t *packet, uint32_t len_packet)
     hlen = ip->ihl * 4;
     icmp = (struct icmphdr *)(msg.msg_iov->iov_base + hlen);
     if (icmp->un.echo.id != getpid())
-        return -1;
+        return -2;
     inet_ntop(buf_in.sin_family, &buf_in.sin_addr, ip_str, INET_ADDRSTRLEN);
     getnameinfo((struct sockaddr *)&buf_in, sizeof(struct sockaddr),
             name, sizeof(name), 0, 0, NI_IDN);
@@ -152,6 +152,7 @@ void    ft_ping(int sockfd, const int *opts, struct sockaddr_in *dst)
     struct icmphdr *hdr_packet = 0;
     uint32_t len_data = opts['s'] ? opts['s'] : DEFAULT_SIZE_DATA;
     uint32_t len_packet = len_data + sizeof(struct icmphdr);
+    int ret = 0;
 
     if (!(packet = create_packet(len_data)))
         return;
@@ -172,14 +173,14 @@ void    ft_ping(int sockfd, const int *opts, struct sockaddr_in *dst)
             } else {
                 global.packet_sended++;
             }
-            if (recv_packet(sockfd, packet, len_packet) < 0) {
+            if ((ret = recv_packet(sockfd, packet, len_packet)) == -1) {
                 recv_error(sockfd, opts);
-            } else {
+            } else if (ret >= 0) {
                 global.packet_reiceved++;
             }
             if (opts['c'] && opts['c'] == seq)
                 break;
-            ++seq;
+            if (ret != -2) ++seq;
             global.loop ^= 0b00000010;
             alarm(opts['i']);
         }
