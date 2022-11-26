@@ -137,7 +137,7 @@ void    recv_error(int sockfd, const int *opts)
         getnameinfo((struct sockaddr *)sin, sizeof(struct sockaddr),
                     name, sizeof(name), 0, 0, NI_IDN);
         if (e->ee_type == ICMP_TIME_EXCEEDED) {
-            printf("From %s (%s) Time to live exceeded\n", name, ip_str);
+            printf("From %s (%s) icmp_seq=%d Time to live exceeded\n", name, ip_str, ntohs(icmph.un.echo.sequence));
         } else {
             printf("From %s: type=%d code=%d info=%d\n", global.host, e->ee_type, e->ee_code, e->ee_info);
         }
